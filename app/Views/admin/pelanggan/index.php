@@ -13,6 +13,10 @@
   <!-- <a href="/pelanggan/create" class="btn btn-primary mb-3"><i class="bi bi-plus-circle"></i> Tambah Pelanggan</a> -->
 
   <div class="table-responsive">
+    <a href="<?= base_url('pelanggan/export') ?>" class="btn btn-success mb-3">
+    <i class="bi bi-file-earmark-excel"></i> Export Excel
+    </a>
+
     <table class="table table-bordered table-striped w-100">
       <thead class="table-light">
         <tr>

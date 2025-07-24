@@ -4,6 +4,8 @@ namespace App\Controllers;
 
 use App\Models\PelangganModel;
 use CodeIgniter\Controller;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class Pelanggan extends Controller
 {
@@ -87,6 +89,46 @@ class Pelanggan extends Controller
         $model->update($id, $data);
 
         return redirect()->to('/pelanggan')->with('success', 'Data pelanggan berhasil diperbarui.');
+    }
+
+    // spreadsheet export function
+    public function export()
+    {
+        $model = new \App\Models\PelangganModel();
+        $data = $model->where('role', 'pelanggan')->findAll();
+
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        // Header kolom
+        $sheet->setCellValue('A1', 'No');
+        $sheet->setCellValue('B1', 'Nama Lengkap');
+        $sheet->setCellValue('C1', 'No Pelanggan');
+        $sheet->setCellValue('D1', 'Alamat');
+        $sheet->setCellValue('E1', 'No HP');
+        $sheet->setCellValue('F1', 'Tanggal Daftar');
+
+        // Isi data
+        $row = 2;
+        foreach ($data as $index => $p) {
+            $sheet->setCellValue('A' . $row, $index + 1);
+            $sheet->setCellValue('B' . $row, $p['nama_lengkap']);
+            $sheet->setCellValue('C' . $row, $p['no_pelanggan']);
+            $sheet->setCellValue('D' . $row, $p['alamat']);
+            $sheet->setCellValue('E' . $row, $p['no_hp']);
+            $sheet->setCellValue('F' . $row, $p['created_at']);
+            $row++;
+        }
+
+        // Kirim ke browser
+        $filename = 'data_pelanggan_' . date('YmdHis') . '.xlsx';
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header("Content-Disposition: attachment; filename=\"$filename\"");
+        header('Cache-Control: max-age=0');
+
+        $writer = new Xlsx($spreadsheet);
+        $writer->save('php://output');
+        exit;
     }
 
 

@@ -26,5 +26,7 @@ $routes->group('', ['filter' => 'auth'], function($routes) {
     $routes->get('/pelanggan/edit/(:num)', 'Pelanggan::edit/$1');
     $routes->post('/pelanggan/update/(:num)', 'Pelanggan::update/$1');
     $routes->get('/pelanggan/delete/(:num)', 'Pelanggan::delete/$1');
+    $routes->get('/pelanggan/export', 'Pelanggan::export');
+
 });
 
