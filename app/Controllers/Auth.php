@@ -64,6 +64,7 @@ class Auth extends Controller
         $nama   = $this->request->getPost('nama_lengkap');
         $alamat = $this->request->getPost('alamat');
         $no_hp  = $this->request->getPost('no_hp');
+        
 
         // Validasi
         if ($password !== $confirm) {

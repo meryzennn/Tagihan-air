@@ -41,7 +41,8 @@
 
               <div class="mb-3">
                 <label>No HP</label>
-                <input type="text" name="no_hp" class="form-control" required>
+                <input type="text" name="no_hp" id="no_hp" class="form-control" required pattern="\d{10,13}" maxlength="13" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                <small class="form-text text-muted">Masukkan nomor HP tanpa spasi atau karakter khusus.</small>
               </div>
 
               <div class="mb-3">

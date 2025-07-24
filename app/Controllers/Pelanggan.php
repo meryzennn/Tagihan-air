@@ -97,39 +97,44 @@ class Pelanggan extends Controller
         $model = new \App\Models\PelangganModel();
         $data = $model->where('role', 'pelanggan')->findAll();
 
-        $spreadsheet = new Spreadsheet();
+        $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
 
-        // Header kolom
+        // Header
         $sheet->setCellValue('A1', 'No');
-        $sheet->setCellValue('B1', 'Nama Lengkap');
-        $sheet->setCellValue('C1', 'No Pelanggan');
-        $sheet->setCellValue('D1', 'Alamat');
-        $sheet->setCellValue('E1', 'No HP');
-        $sheet->setCellValue('F1', 'Tanggal Daftar');
+        $sheet->setCellValue('B1', 'Username');
+        $sheet->setCellValue('C1', 'Nama Lengkap');
+        $sheet->setCellValue('D1', 'No Pelanggan');
+        $sheet->setCellValue('E1', 'Alamat');
+        $sheet->setCellValue('F1', 'No HP');
+        $sheet->setCellValue('G1', 'Tanggal Daftar');
+        $sheet->setCellValue('H1', 'Waktu Ekspor');
 
-        // Isi data
         $row = 2;
+        $timestamp = date('Y-m-d H:i:s');
+
         foreach ($data as $index => $p) {
             $sheet->setCellValue('A' . $row, $index + 1);
-            $sheet->setCellValue('B' . $row, $p['nama_lengkap']);
-            $sheet->setCellValue('C' . $row, $p['no_pelanggan']);
-            $sheet->setCellValue('D' . $row, $p['alamat']);
-            $sheet->setCellValue('E' . $row, $p['no_hp']);
-            $sheet->setCellValue('F' . $row, $p['created_at']);
+            $sheet->setCellValue('B' . $row, $p['username']);
+            $sheet->setCellValue('C' . $row, $p['nama_lengkap']);
+            $sheet->setCellValue('D' . $row, $p['no_pelanggan']);
+            $sheet->setCellValue('E' . $row, $p['alamat']);
+            $sheet->setCellValue('F' . $row, $p['no_hp']);
+            $sheet->setCellValue('G' . $row, $p['created_at']);
+            $sheet->setCellValue('H' . $row, $timestamp);
             $row++;
         }
 
-        // Kirim ke browser
-        $filename = 'data_pelanggan_' . date('YmdHis') . '.xlsx';
+        $filename = 'data_pelanggan_' . date('Ymd_His') . '.xlsx';
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         header("Content-Disposition: attachment; filename=\"$filename\"");
         header('Cache-Control: max-age=0');
 
-        $writer = new Xlsx($spreadsheet);
+        $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
         $writer->save('php://output');
         exit;
     }
+
 
 
 

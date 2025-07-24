@@ -1,33 +1,29 @@
 <?= $this->extend('layouts/admin_layout') ?>
-<?= $this->section('content') ?>
 
+<?= $this->section('content') ?>
 <div class="container">
   <h3 class="mb-4">Edit Data Pelanggan</h3>
 
-  <form action="<?= base_url('/pelanggan/update/' . $pelanggan['id']) ?>" method="post">
+  <form action="<?= base_url('/pelanggan/update/' . $pelanggan['id_user']) ?>" method="post">
     <div class="mb-3">
-      <label for="no_pelanggan">Nomor Pelanggan</label>
-      <input type="text" name="no_pelanggan" id="no_pelanggan" value="<?= $pelanggan['no_pelanggan'] ?>" class="form-control" required>
+      <label for="no_pelanggan" class="form-label">Nomor Pelanggan</label>
+      <input type="text" name="no_pelanggan" id="no_pelanggan" class="form-control" value="<?= esc($pelanggan['no_pelanggan']) ?>" readonly>
+    </div>
+    <div class="mb-3">
+      <label for="nama_lengkap" class="form-label">Nama Lengkap</label>
+      <input type="text" name="nama_lengkap" id="nama_lengkap" class="form-control" value="<?= esc($pelanggan['nama_lengkap']) ?>" required>
+    </div>
+    <div class="mb-3">
+      <label for="alamat" class="form-label">Alamat</label>
+      <textarea name="alamat" id="alamat" class="form-control" required><?= esc($pelanggan['alamat']) ?></textarea>
+    </div>
+    <div class="mb-3">
+      <label for="no_hp" class="form-label">No. HP</label>
+      <input type="text" name="no_hp" id="no_hp" class="form-control" value="<?= esc($pelanggan['no_hp']) ?>" required>
     </div>
 
-    <div class="mb-3">
-      <label for="nama">Nama</label>
-      <input type="text" name="nama" id="nama" value="<?= $pelanggan['nama'] ?>" class="form-control" required>
-    </div>
-
-    <div class="mb-3">
-      <label for="alamat">Alamat</label>
-      <textarea name="alamat" id="alamat" class="form-control" required><?= $pelanggan['alamat'] ?></textarea>
-    </div>
-
-    <div class="mb-3">
-      <label for="no_hp">Nomor HP</label>
-      <input type="text" name="no_hp" id="no_hp" value="<?= $pelanggan['no_hp'] ?>" class="form-control" required>
-    </div>
-
-    <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+    <button type="submit" class="btn btn-primary">Update</button>
     <a href="<?= base_url('/pelanggan') ?>" class="btn btn-secondary">Batal</a>
   </form>
 </div>
-
 <?= $this->endSection() ?>

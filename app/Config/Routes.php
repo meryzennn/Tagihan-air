@@ -19,7 +19,7 @@ $routes->group('', ['filter' => 'auth'], function($routes) {
     $routes->get('/dashboard/admin', 'Dashboard::admin');
     $routes->get('/dashboard/user', 'Dashboard::user');
 
-    // Pelanggan CRUD
+    // adminCRUD
     $routes->get('/pelanggan', 'Pelanggan::index');
     $routes->get('/pelanggan/create', 'Pelanggan::create');
     $routes->post('/pelanggan/store', 'Pelanggan::store');
@@ -27,6 +27,10 @@ $routes->group('', ['filter' => 'auth'], function($routes) {
     $routes->post('/pelanggan/update/(:num)', 'Pelanggan::update/$1');
     $routes->get('/pelanggan/delete/(:num)', 'Pelanggan::delete/$1');
     $routes->get('/pelanggan/export', 'Pelanggan::export');
+    $routes->get('/penggunaan-air', 'PenggunaanAir::index');
+    $routes->get('/penggunaan-air/create', 'PenggunaanAir::create');
+    $routes->post('/penggunaan-air/store', 'PenggunaanAir::store');
+
 
 });
 

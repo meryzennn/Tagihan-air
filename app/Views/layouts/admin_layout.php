@@ -20,7 +20,7 @@
   <h5 class="mb-4">Admin Panel</h5>
   <a href="<?= base_url('/dashboard/admin') ?>"><i class="bi bi-house-door"></i> Dashboard</a>
   <a href="<?= base_url('/pelanggan') ?>"><i class="bi bi-people-fill"></i> Data Pelanggan</a>
-  <a href="#"><i class="bi bi-droplet-half"></i> Penggunaan Air</a>
+  <a class="nav-link" href="<?= base_url('penggunaan-air') ?>"><i class="bi bi-droplet"></i>Penggunaan Air</a>
   <a href="#"><i class="bi bi-cash-stack"></i> Tagihan</a>
   <a href="#"><i class="bi bi-bar-chart-line"></i> Laporan</a>
   <a href="#"><i class="bi bi-gear"></i> Tarif Air</a>
