@@ -1,0 +1,94 @@
+<?php
+
+namespace App\Controllers;
+
+use App\Models\PelangganModel;
+use CodeIgniter\Controller;
+
+class Pelanggan extends Controller
+{
+    public function index()
+    {
+        $model = new \App\Models\PelangganModel();
+        $data['pelanggan'] = $model->where('role', 'pelanggan')->findAll();
+
+        return view('admin/pelanggan/index', $data);
+    }
+
+
+    public function create()
+    {
+        $data['title'] = 'Tambah Pelanggan';
+        return view('admin/pelanggan/create', $data);
+    }
+
+    public function store()
+    {
+    $model = new PelangganModel();
+
+    // Generate no_pelanggan otomatis, contoh: PLG20250723001
+    $no_pelanggan = 'PLG' . date('Ymd') . rand(100, 999);
+
+    $password = $this->request->getPost('password');
+    $username = $this->request->getPost('username');
+
+    // Validasi sederhana
+    if ($model->where('username', $username)->first()) {
+        return redirect()->back()->with('error', 'Username sudah digunakan!');
+    }
+
+    $data = [
+        'username'      => $username,
+        'password'      => password_hash($password, PASSWORD_DEFAULT),
+        'role'          => 'pelanggan',
+        'nama_lengkap'  => $this->request->getPost('nama_lengkap'),
+        'alamat'        => $this->request->getPost('alamat'),
+        'no_hp'         => $this->request->getPost('no_hp'),
+        'no_pelanggan'  => $no_pelanggan,
+        'created_at'    => date('Y-m-d H:i:s')
+    ];
+
+    $model->insert($data);
+
+    return redirect()->to('/pelanggan')->with('success', 'Pelanggan berhasil ditambahkan!');
+}
+
+    public function delete($id)
+    {
+        $model = new PelangganModel();
+        $model->delete($id);
+
+        return redirect()->to('/pelanggan')->with('success', 'Data pelanggan berhasil dihapus.');
+    }
+    public function edit($id)
+    {
+        $model = new \App\Models\PelangganModel();
+        $data['pelanggan'] = $model->find($id);
+        $data['title'] = 'Edit Data Pelanggan';
+
+        if (!$data['pelanggan']) {
+            return redirect()->to('/pelanggan')->with('error', 'Data pelanggan tidak ditemukan.');
+        }
+
+        return view('admin/pelanggan/edit', $data);
+    }
+
+    public function update($id)
+    {
+        $model = new \App\Models\PelangganModel();
+
+        $data = [
+            'no_pelanggan' => $this->request->getPost('no_pelanggan'),
+            'nama_lengkap' => $this->request->getPost('nama_lengkap'),
+            'alamat'       => $this->request->getPost('alamat'),
+            'no_hp'        => $this->request->getPost('no_hp'),
+        ];
+
+        $model->update($id, $data);
+
+        return redirect()->to('/pelanggan')->with('success', 'Data pelanggan berhasil diperbarui.');
+    }
+
+
+
+}
