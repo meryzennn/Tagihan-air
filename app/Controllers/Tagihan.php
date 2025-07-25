@@ -104,58 +104,71 @@ class Tagihan extends BaseController
     }
 
     public function export()
-    {
-        $tarifModel = new TarifAirModel();
+{
+    $tarifModel = new TarifAirModel();
 
-        $builder = $this->db->table('tagihan');
-        $builder->select('
-            tagihan.*, 
-            penggunaan_air.tanggal_pencatatan, 
-            penggunaan_air.meter_awal, 
-            penggunaan_air.meter_akhir,
-            users.no_pelanggan, 
-            users.nama_lengkap
-        ');
-        $builder->join('penggunaan_air', 'penggunaan_air.id_penggunaan = tagihan.id_penggunaan');
-        $builder->join('users', 'users.id_user = penggunaan_air.id_user');
-        $data = $builder->get()->getResultArray();
+    $builder = $this->db->table('tagihan');
+    $builder->select('
+        tagihan.*, 
+        penggunaan_air.tanggal_pencatatan, 
+        penggunaan_air.meter_awal, 
+        penggunaan_air.meter_akhir,
+        users.no_pelanggan, 
+        users.nama_lengkap
+    ');
+    $builder->join('penggunaan_air', 'penggunaan_air.id_penggunaan = tagihan.id_penggunaan');
+    $builder->join('users', 'users.id_user = penggunaan_air.id_user');
+    $data = $builder->get()->getResultArray();
 
-        $spreadsheet = new Spreadsheet();
-        $sheet = $spreadsheet->getActiveSheet();
+    $spreadsheet = new Spreadsheet();
+    $sheet = $spreadsheet->getActiveSheet();
 
-        $sheet->fromArray([
-            ['No', 'No Pelanggan', 'Nama', 'Tanggal', 'Pemakaian (m³)', 'Total Tagihan', 'Status']
-        ], NULL, 'A1');
+    // Header kolom (tambahkan Harga/m³)
+    $sheet->fromArray([
+        ['No', 'No Pelanggan', 'Nama', 'Tanggal', 'Pemakaian (m³)', 'Harga/m³', 'Total Tagihan', 'Status']
+    ], NULL, 'A1');
 
-        $row = 2;
-        foreach ($data as $i => $t) {
-            $tarif = $tarifModel
-                ->where('berlaku_mulai <=', $t['tanggal_pencatatan'])
-                ->orderBy('berlaku_mulai', 'DESC')
-                ->first();
+    $row = 2;
+    foreach ($data as $i => $t) {
+        $tarif = $tarifModel
+            ->where('berlaku_mulai <=', $t['tanggal_pencatatan'])
+            ->orderBy('berlaku_mulai', 'DESC')
+            ->first();
 
-            $harga = $tarif ? $tarif['harga_per_m3'] : 2500;
-            $pemakaian = $t['meter_akhir'] - $t['meter_awal'];
-            $total_tagihan = $pemakaian * $harga;
+        $harga = $tarif ? $tarif['harga_per_m3'] : 2500;
+        $pemakaian = $t['meter_akhir'] - $t['meter_awal'];
+        $total_tagihan = $pemakaian * $harga;
 
-            $sheet->fromArray([
-                $i + 1,
-                $t['no_pelanggan'],
-                $t['nama_lengkap'],
-                $t['tanggal_pencatatan'],
-                $pemakaian,
-                $total_tagihan,
-                $t['status']
-            ], NULL, 'A' . $row++);
-        }
+        // Isi data
+        $sheet->setCellValue("A{$row}", $i + 1);
+        $sheet->setCellValue("B{$row}", $t['no_pelanggan']);
+        $sheet->setCellValue("C{$row}", $t['nama_lengkap']);
+        $sheet->setCellValue("D{$row}", $t['tanggal_pencatatan']);
+        $sheet->setCellValue("E{$row}", $pemakaian);
+        $sheet->setCellValue("F{$row}", $harga);
+        $sheet->setCellValue("G{$row}", $total_tagihan);
+        $sheet->setCellValue("H{$row}", $t['status']);
 
-        $filename = 'data_tagihan_' . date('Ymd_His') . '.xlsx';
-        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        header("Content-Disposition: attachment;filename=\"$filename\"");
-        header('Cache-Control: max-age=0');
+        // Format Rp untuk kolom Harga/m³ dan Total Tagihan
+        $sheet->getStyle("F{$row}")->getNumberFormat()->setFormatCode('"Rp"#,##0.00');
+        $sheet->getStyle("G{$row}")->getNumberFormat()->setFormatCode('"Rp"#,##0.00');
 
-        $writer = new Xlsx($spreadsheet);
-        $writer->save('php://output');
-        exit;
+        $row++;
     }
+
+    // Atur agar semua kolom auto-size
+    foreach (range('A', 'H') as $col) {
+        $sheet->getColumnDimension($col)->setAutoSize(true);
+    }
+
+    $filename = 'data_tagihan_' . date('Ymd_His') . '.xlsx';
+    header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    header("Content-Disposition: attachment;filename=\"$filename\"");
+    header('Cache-Control: max-age=0');
+
+    $writer = new Xlsx($spreadsheet);
+    $writer->save('php://output');
+    exit;
+}
+
 }

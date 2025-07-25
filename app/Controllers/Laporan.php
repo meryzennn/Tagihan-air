@@ -98,6 +98,7 @@ class Laporan extends BaseController
             $sheet->setCellValue("D$row", $r['total_tagihan']);
             $sheet->setCellValue("E$row", $r['jumlah_lunas']);
             $sheet->setCellValue("F$row", $r['jumlah_belum']);
+            $sheet->getStyle("D{$row}")->getNumberFormat()->setFormatCode('"Rp"#,##0.00');
             $row++;
         }
 
