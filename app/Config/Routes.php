@@ -41,6 +41,15 @@ $routes->group('', ['filter' => 'auth'], function($routes) {
     $routes->get('tagihan/generate', 'Tagihan::generate');
     $routes->get('/tagihan/export', 'Tagihan::export');
 
+    // Laporan
+    $routes->get('/admin/laporan', 'Laporan::index');
+    $routes->get('/admin/laporan/export/excel', 'Laporan::exportExcel');
+    $routes->get('/admin/laporan/export/pdf', 'Laporan::exportPDF');
+
+
+
+
+
 
 });
 

@@ -72,8 +72,8 @@
     <i class="bi bi-cash-stack"></i> Tagihan
   </a>
 
-  <a href="<?= base_url('/laporan') ?>" class="<?= $currentUri === 'laporan' ? 'active' : '' ?>">
-    <i class="bi bi-bar-chart-line"></i> Laporan
+  <a href="<?= base_url('admin/laporan') ?>" class="nav-link <?= (uri_string() == 'admin/laporan') ? 'active' : '' ?>">
+    <i class="bi bi-file-earmark-text"></i> Laporan
   </a>
 
   <a href="<?= base_url('/tarif') ?>" class="<?= $currentUri === 'tarif' ? 'active' : '' ?>">
