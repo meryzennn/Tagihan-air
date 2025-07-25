@@ -6,6 +6,7 @@ use App\Models\PelangganModel;
 use CodeIgniter\Controller;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use PhpOffice\PhpSpreadsheet\Cell\DataType;
 
 class Pelanggan extends Controller
 {
@@ -97,10 +98,10 @@ class Pelanggan extends Controller
         $model = new \App\Models\PelangganModel();
         $data = $model->where('role', 'pelanggan')->findAll();
 
-        $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+        $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
 
-        // Header
+        // Judul header
         $sheet->setCellValue('A1', 'No');
         $sheet->setCellValue('B1', 'Username');
         $sheet->setCellValue('C1', 'Nama Lengkap');
@@ -110,30 +111,43 @@ class Pelanggan extends Controller
         $sheet->setCellValue('G1', 'Tanggal Daftar');
         $sheet->setCellValue('H1', 'Waktu Ekspor');
 
+        // Data isi
         $row = 2;
         $timestamp = date('Y-m-d H:i:s');
-
         foreach ($data as $index => $p) {
             $sheet->setCellValue('A' . $row, $index + 1);
             $sheet->setCellValue('B' . $row, $p['username']);
             $sheet->setCellValue('C' . $row, $p['nama_lengkap']);
             $sheet->setCellValue('D' . $row, $p['no_pelanggan']);
             $sheet->setCellValue('E' . $row, $p['alamat']);
-            $sheet->setCellValue('F' . $row, $p['no_hp']);
-            $sheet->setCellValue('G' . $row, $p['created_at']);
+            $sheet->setCellValueExplicit('F' . $row, $p['no_hp'], DataType::TYPE_STRING);
+
+            // Format tanggal yang lebih jelas
+            $tanggalDaftar = date('d-m-Y H:i', strtotime($p['created_at']));
+            $sheet->setCellValue('G' . $row, $tanggalDaftar);
+
             $sheet->setCellValue('H' . $row, $timestamp);
             $row++;
         }
 
+        // Otomatis sesuaikan lebar kolom
+        foreach (range('A', 'H') as $col) {
+            $sheet->getColumnDimension($col)->setAutoSize(true);
+        }
+
+        // Nama file ekspor
         $filename = 'data_pelanggan_' . date('Ymd_His') . '.xlsx';
+
+        // Header untuk download
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         header("Content-Disposition: attachment; filename=\"$filename\"");
         header('Cache-Control: max-age=0');
 
-        $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+        $writer = new Xlsx($spreadsheet);
         $writer->save('php://output');
         exit;
     }
+
 
 
 

@@ -88,7 +88,7 @@ class Laporan extends BaseController
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
 
-        $sheet->fromArray(['Bulan', 'Jumlah Pelanggan', 'Total Pemakaian', 'Total Tagihan', 'Tagihan Lunas', 'Belum Dibayar'], NULL, 'A1');
+        $sheet->fromArray(['Bulan', 'Jumlah Pelanggan', 'Total Pemakaian (m³)', 'Total Tagihan', 'Tagihan Lunas', 'Belum Dibayar'], NULL, 'A1');
 
         $row = 2;
         foreach ($rekap as $r) {
@@ -99,7 +99,9 @@ class Laporan extends BaseController
             $sheet->setCellValue("E$row", $r['jumlah_lunas']);
             $sheet->setCellValue("F$row", $r['jumlah_belum']);
             $sheet->getStyle("D{$row}")->getNumberFormat()->setFormatCode('"Rp"#,##0.00');
-            $row++;
+            $row++;foreach (range('A', 'F') as $col) {
+                $sheet->getColumnDimension($col)->setAutoSize(true);
+                }
         }
 
         $filename = 'laporan_bulanan.xlsx';

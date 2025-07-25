@@ -151,16 +151,25 @@ class PenggunaanAir extends BaseController
             $total = $p['meter_akhir'] - $p['meter_awal'];
             $tagihan = $total * $hargaPerM3;
 
-            $sheet->fromArray([
-                $i + 1,
-                $p['no_pelanggan'],
-                $p['nama_lengkap'],
-                $p['tanggal_pencatatan'],
-                $p['meter_awal'],
-                $p['meter_akhir'],
-                $total,
-                $tagihan
-            ], NULL, 'A' . $row++);
+            // Isi baris data
+            $sheet->setCellValue("A$row", $i + 1);
+            $sheet->setCellValue("B$row", $p['no_pelanggan']);
+            $sheet->setCellValue("C$row", $p['nama_lengkap']);
+            $sheet->setCellValue("D$row", $p['tanggal_pencatatan']);
+            $sheet->setCellValue("E$row", $p['meter_awal']);
+            $sheet->setCellValue("F$row", $p['meter_akhir']);
+            $sheet->setCellValue("G$row", $total);
+            $sheet->setCellValue("H$row", $tagihan);
+
+            // Format kolom H sebagai Rupiah
+            $sheet->getStyle("H{$row}")->getNumberFormat()->setFormatCode('"Rp"#,##0');
+
+            $row++;
+        }
+
+        // Auto-size semua kolom A-H
+        foreach (range('A', 'H') as $col) {
+            $sheet->getColumnDimension($col)->setAutoSize(true);
         }
 
         $filename = 'data_penggunaan_air_' . date('Ymd_His') . '.xlsx';
@@ -172,4 +181,5 @@ class PenggunaanAir extends BaseController
         $writer->save('php://output');
         exit;
     }
+
 }
