@@ -44,7 +44,8 @@ $routes->group('', ['filter' => 'auth'], function($routes) {
     // Laporan
     $routes->get('/admin/laporan', 'Laporan::index');
     $routes->get('/admin/laporan/export/excel', 'Laporan::exportExcel');
-    $routes->get('/admin/laporan/export/pdf', 'Laporan::exportPDF');
+    $routes->get('/admin/laporan/pdf', 'Laporan::exportPDF');
+
 
 
 
