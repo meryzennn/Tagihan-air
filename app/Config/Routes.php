@@ -36,6 +36,11 @@ $routes->group('', ['filter' => 'auth'], function($routes) {
     $routes->post('penggunaan-air/update/(:num)', 'PenggunaanAir::update/$1');
     $routes->get('/penggunaan-air/export', 'PenggunaanAir::export');
 
+    // Tagihan
+    $routes->get('/tagihan', 'Tagihan::index');
+    $routes->get('tagihan/generate', 'Tagihan::generate');
+    $routes->get('/tagihan/export', 'Tagihan::export');
+
 
 });
 
