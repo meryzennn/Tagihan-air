@@ -1,5 +1,11 @@
 <!DOCTYPE html>
 <html lang="id">
+  <!-- Flatpickr CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+
+<!-- Flatpickr JS -->
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
 <head>
   <meta charset="UTF-8">
   <title><?= $title ?? 'Admin Panel' ?></title>

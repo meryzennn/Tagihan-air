@@ -27,9 +27,14 @@ $routes->group('', ['filter' => 'auth'], function($routes) {
     $routes->post('/pelanggan/update/(:num)', 'Pelanggan::update/$1');
     $routes->get('/pelanggan/delete/(:num)', 'Pelanggan::delete/$1');
     $routes->get('/pelanggan/export', 'Pelanggan::export');
+    // Penggunaan Air
     $routes->get('/penggunaan-air', 'PenggunaanAir::index');
     $routes->get('/penggunaan-air/create', 'PenggunaanAir::create');
     $routes->post('/penggunaan-air/store', 'PenggunaanAir::store');
+    $routes->get('penggunaan-air/delete/(:num)', 'PenggunaanAir::delete/$1');
+    $routes->get('penggunaan-air/edit/(:num)', 'PenggunaanAir::edit/$1');
+    $routes->post('penggunaan-air/update/(:num)', 'PenggunaanAir::update/$1');
+    $routes->get('/penggunaan-air/export', 'PenggunaanAir::export');
 
 
 });

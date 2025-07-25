@@ -10,18 +10,20 @@
 
   <form action="<?= base_url('/penggunaan-air/store') ?>" method="post">
     
-    <!-- Pilih Pelanggan -->
-    <div class="mb-3">
-      <label for="id_user" class="form-label">Nomor Pelanggan</label>
-      <select name="id_user" id="id_user" class="form-select" required>
-        <option value="">-- Pilih Pelanggan --</option>
-        <?php foreach ($pelanggan as $p): ?>
-          <option value="<?= $p['id_user'] ?>">
-            <?= esc($p['no_pelanggan']) ?> - <?= esc($p['nama_lengkap']) ?>
-          </option>
-        <?php endforeach; ?>
-      </select>
-    </div>
+    <!-- Nomor Pelanggan (Autocomplete) -->
+  <div class="mb-3">
+    <label for="no_pelanggan" class="form-label">Nomor Pelanggan</label>
+    <input type="text" name="no_pelanggan" id="no_pelanggan" class="form-control" list="listPelanggan" required>
+
+    <datalist id="listPelanggan">
+      <?php foreach ($pelanggan as $p): ?>
+        <option value="<?= esc($p['no_pelanggan']) ?>">
+          <?= esc($p['no_pelanggan']) ?> - <?= esc($p['nama_lengkap']) ?>
+        </option>
+      <?php endforeach; ?>
+    </datalist>
+  </div>
+
 
     <!-- Tanggal Pencatatan -->
     <div class="mb-3">
