@@ -20,7 +20,7 @@
       font-family: 'Segoe UI', sans-serif;
     }
     .sidebar {
-      width: 250px;
+      width: 270px;
       background: #e0e0e0;
       padding: 25px 15px;
       box-shadow: 2px 0 5px rgba(0,0,0,0.05);
@@ -53,7 +53,7 @@
 
 <!-- Sidebar -->
 <div class="sidebar">
-  <h5 class="mb-4">Admin Panel</h5>
+  <h2 class="mb-5">Admin Panel</h2>
 
   <a href="<?= base_url('/dashboard/admin') ?>" class="<?= $currentUri === 'dashboard' ? 'active' : '' ?>">
     <i class="bi bi-house-door"></i> Dashboard
@@ -107,6 +107,7 @@
       cancelButtonColor: '#6c757d',
       confirmButtonText: 'Ya, logout',
       cancelButtonText: 'Batal',
+
       color: '#333'
     }).then((result) => {
       if (result.isConfirmed) {
