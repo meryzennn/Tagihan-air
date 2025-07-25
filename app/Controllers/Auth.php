@@ -44,8 +44,9 @@ class Auth extends Controller
     public function logout()
     {
         session()->destroy();
-        return redirect()->to('/login?logout=success');
+        return redirect()->to('/login')->with('success', 'Anda berhasil logout!');
     }
+
 
     public function registerForm()
     {

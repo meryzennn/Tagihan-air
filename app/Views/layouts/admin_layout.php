@@ -9,7 +9,6 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
 
-
   <!-- Flatpickr (untuk tanggal) -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 
@@ -49,7 +48,7 @@
 
 <?php
   // Tangkap URI yang sedang aktif
-  $currentUri = service('uri')->getSegment(1); // Ambil segmen pertama dari URI
+  $currentUri = service('uri')->getSegment(1);
 ?>
 
 <!-- Sidebar -->
@@ -72,15 +71,16 @@
     <i class="bi bi-cash-stack"></i> Tagihan
   </a>
 
-  <a href="<?= base_url('admin/laporan') ?>" class="nav-link <?= (uri_string() == 'admin/laporan') ? 'active' : '' ?>">
+  <a href="<?= base_url('admin/laporan') ?>" class="<?= (uri_string() == 'admin/laporan') ? 'active' : '' ?>">
     <i class="bi bi-file-earmark-text"></i> Laporan
   </a>
 
-  <a class="nav-link" href="<?= base_url('/tarif') ?>">
+  <a class="<?= $currentUri === 'tarif' ? 'active' : '' ?>" href="<?= base_url('/tarif') ?>">
     <i class="bi bi-currency-dollar"></i> Tarif Air
   </a>
 
-  <a href="<?= base_url('/logout') ?>">
+  <!-- Logout dengan konfirmasi -->
+  <a href="#" onclick="confirmLogout()">
     <i class="bi bi-box-arrow-right"></i> Logout
   </a>
 </div>
@@ -94,6 +94,40 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<!-- SweetAlert Konfirmasi Logout -->
+<script>
+  function confirmLogout() {
+    Swal.fire({
+      title: 'Yakin ingin logout?',
+      icon: 'warning',
+      iconColor: '#ffc107',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#6c757d',
+      confirmButtonText: 'Ya, logout',
+      cancelButtonText: 'Batal',
+      color: '#333'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        window.location.href = "<?= base_url('/logout') ?>";
+      }
+    });
+  }
+</script>
+
+<!-- SweetAlert Jika Flashdata Success -->
+<?php if (session()->getFlashdata('success')): ?>
+<script>
+  Swal.fire({
+    icon: 'success',
+    title: 'Berhasil',
+    text: '<?= session()->getFlashdata('success') ?>',
+    timer: 2500,
+    showConfirmButton: false
+  });
+</script>
+<?php endif; ?>
 
 </body>
 </html>
