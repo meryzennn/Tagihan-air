@@ -5,6 +5,7 @@ namespace App\Controllers;
 use App\Models\PenggunaanAirModel;
 use App\Models\PelangganModel;
 use App\Models\TagihanModel;
+use App\Models\TarifAirModel;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
@@ -19,10 +20,15 @@ class PenggunaanAir extends BaseController
             ->orderBy('tanggal_pencatatan', 'DESC')
             ->findAll();
 
-        // Hitung total pemakaian dan tagihan
+        // Ambil tarif terbaru dari DB
+        $tarifModel = new TarifAirModel();
+        $tarif = $tarifModel->first();
+        $hargaPerM3 = $tarif['harga_per_m3'] ?? 2500;
+
+        // Hitung total pemakaian & tagihan dinamis
         foreach ($data['penggunaan'] as &$row) {
             $row['total_pemakaian'] = $row['meter_akhir'] - $row['meter_awal'];
-            $row['tagihan'] = $row['total_pemakaian'] * 2500;
+            $row['tagihan'] = $row['total_pemakaian'] * $hargaPerM3;
         }
 
         return view('admin/penggunaan_air/index', $data);
@@ -31,9 +37,7 @@ class PenggunaanAir extends BaseController
     public function create()
     {
         $pelangganModel = new PelangganModel();
-        $data['pelanggan'] = $pelangganModel
-            ->where('role', 'pelanggan')
-            ->findAll();
+        $data['pelanggan'] = $pelangganModel->where('role', 'pelanggan')->findAll();
 
         return view('admin/penggunaan_air/create', $data);
     }
@@ -41,9 +45,9 @@ class PenggunaanAir extends BaseController
     public function store()
     {
         $no_pelanggan = $this->request->getPost('no_pelanggan');
-        $pelangganModel = new \App\Models\PelangganModel();
+        $pelangganModel = new PelangganModel();
 
-        // Cari data user berdasarkan no_pelanggan
+        // Cari data pelanggan
         $pelanggan = $pelangganModel->where('no_pelanggan', $no_pelanggan)->first();
 
         if (!$pelanggan) {
@@ -52,10 +56,15 @@ class PenggunaanAir extends BaseController
 
         $id_user = $pelanggan['id_user'];
 
-        $penggunaanModel = new \App\Models\PenggunaanAirModel();
-        $tagihanModel    = new \App\Models\TagihanModel();
+        // Ambil tarif dari DB
+        $tarifModel = new TarifAirModel();
+        $tarif = $tarifModel->first();
+        $hargaPerM3 = $tarif['harga_per_m3'] ?? 2500;
 
-        // Simpan data penggunaan air
+        $penggunaanModel = new PenggunaanAirModel();
+        $tagihanModel    = new TagihanModel();
+
+        // Simpan data penggunaan
         $data = [
             'id_user'             => $id_user,
             'tanggal_pencatatan' => $this->request->getPost('tanggal_pencatatan'),
@@ -67,9 +76,9 @@ class PenggunaanAir extends BaseController
         $penggunaanModel->insert($data);
         $id_penggunaan = $penggunaanModel->getInsertID();
 
-        // Hitung tagihan
+        // Hitung tagihan berdasarkan tarif dinamis
         $total_pemakaian = $data['meter_akhir'] - $data['meter_awal'];
-        $total_tagihan   = $total_pemakaian * 2500;
+        $total_tagihan   = $total_pemakaian * $hargaPerM3;
 
         // Simpan ke tabel tagihan
         $tagihanModel->insert([
@@ -81,7 +90,6 @@ class PenggunaanAir extends BaseController
 
         return redirect()->to('/penggunaan-air')->with('success', 'Data penggunaan air & tagihan berhasil ditambahkan.');
     }
-
 
     public function edit($id)
     {
@@ -125,6 +133,11 @@ class PenggunaanAir extends BaseController
             ->orderBy('tanggal_pencatatan', 'DESC')
             ->findAll();
 
+        // Ambil tarif dari DB
+        $tarifModel = new TarifAirModel();
+        $tarif = $tarifModel->first();
+        $hargaPerM3 = $tarif['harga_per_m3'] ?? 2500;
+
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
 
@@ -136,7 +149,7 @@ class PenggunaanAir extends BaseController
         $row = 2;
         foreach ($data as $i => $p) {
             $total = $p['meter_akhir'] - $p['meter_awal'];
-            $tagihan = $total * 2500;
+            $tagihan = $total * $hargaPerM3;
 
             $sheet->fromArray([
                 $i + 1,

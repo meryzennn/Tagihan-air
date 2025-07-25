@@ -9,6 +9,8 @@ class TagihanModel extends Model
     protected $table = 'tagihan';
     protected $primaryKey = 'id_tagihan';
     protected $allowedFields = ['id_penggunaan', 'total_tagihan', 'status', 'created_at'];
+    protected $useTimestamps = false;
+
 
     // Tambahan fungsi untuk laporan bulanan
     public function getRekapBulanan()

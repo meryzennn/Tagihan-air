@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use App\Models\TagihanModel;
+use App\Models\TarifAirModel;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Dompdf\Dompdf;
@@ -10,33 +11,79 @@ use Dompdf\Options;
 
 class Laporan extends BaseController
 {
-    public function index()
+    protected function getRekapData()
     {
-        // Ambil data rekap bulanan (misal query group by month)
         $db = \Config\Database::connect();
+        $tarifModel = new TarifAirModel();
+
         $query = $db->query("
             SELECT 
-                MONTH(penggunaan_air.tanggal_pencatatan) AS bulan,
-                COUNT(DISTINCT penggunaan_air.id_user) AS total_pelanggan,
-                SUM(penggunaan_air.meter_akhir - penggunaan_air.meter_awal) AS total_pemakaian,
-                SUM(tagihan.total_tagihan) AS total_tagihan,
-                SUM(CASE WHEN tagihan.status = 'Lunas' THEN 1 ELSE 0 END) AS jumlah_lunas,
-                SUM(CASE WHEN tagihan.status = 'Belum Dibayar' THEN 1 ELSE 0 END) AS jumlah_belum
+                penggunaan_air.id_user,
+                penggunaan_air.tanggal_pencatatan,
+                penggunaan_air.meter_awal,
+                penggunaan_air.meter_akhir,
+                tagihan.status
             FROM tagihan
             JOIN penggunaan_air ON tagihan.id_penggunaan = penggunaan_air.id_penggunaan
-            GROUP BY MONTH(penggunaan_air.tanggal_pencatatan)
-            ORDER BY bulan ASC
         ");
-        $data['rekap'] = $query->getResultArray();
-        
+
+        $data_per_bulan = [];
+
+        foreach ($query->getResultArray() as $row) {
+            $bulan = date('n', strtotime($row['tanggal_pencatatan']));
+
+            $tarif = $tarifModel
+                ->where('berlaku_mulai <=', $row['tanggal_pencatatan'])
+                ->orderBy('berlaku_mulai', 'DESC')
+                ->first();
+            $harga_per_m3 = $tarif ? $tarif['harga_per_m3'] : 2500;
+
+            $pemakaian = $row['meter_akhir'] - $row['meter_awal'];
+            $total_tagihan = $pemakaian * $harga_per_m3;
+
+            if (!isset($data_per_bulan[$bulan])) {
+                $data_per_bulan[$bulan] = [
+                    'bulan' => $bulan,
+                    'total_pelanggan' => 0,
+                    'total_pemakaian' => 0,
+                    'total_tagihan' => 0,
+                    'jumlah_lunas' => 0,
+                    'jumlah_belum' => 0,
+                    'pelanggan_set' => []
+                ];
+            }
+
+            if (!in_array($row['id_user'], $data_per_bulan[$bulan]['pelanggan_set'])) {
+                $data_per_bulan[$bulan]['total_pelanggan']++;
+                $data_per_bulan[$bulan]['pelanggan_set'][] = $row['id_user'];
+            }
+
+            $data_per_bulan[$bulan]['total_pemakaian'] += $pemakaian;
+            $data_per_bulan[$bulan]['total_tagihan'] += $total_tagihan;
+            if ($row['status'] === 'Lunas') {
+                $data_per_bulan[$bulan]['jumlah_lunas']++;
+            } else {
+                $data_per_bulan[$bulan]['jumlah_belum']++;
+            }
+        }
+
+        foreach ($data_per_bulan as &$val) {
+            unset($val['pelanggan_set']);
+        }
+
+        ksort($data_per_bulan);
+        return array_values($data_per_bulan);
+    }
+
+    public function index()
+    {
+        $data['rekap'] = $this->getRekapData();
         return view('admin/laporan/index', $data);
     }
 
-    // Export to Excel
     public function exportExcel()
     {
-        $model = new TagihanModel();
-        $rekap = $model->getRekapBulanan();
+        $rekap = $this->getRekapData();
 
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
@@ -63,27 +110,11 @@ class Laporan extends BaseController
         $writer->save('php://output');
         exit;
     }
-    // Export to PDF
-    // This function generates a PDF report of the monthly usage and billing summary
+
     public function exportPDF()
     {
-        $db = \Config\Database::connect();
-        $query = $db->query("
-            SELECT 
-                MONTH(penggunaan_air.tanggal_pencatatan) AS bulan,
-                COUNT(DISTINCT penggunaan_air.id_user) AS total_pelanggan,
-                SUM(penggunaan_air.meter_akhir - penggunaan_air.meter_awal) AS total_pemakaian,
-                SUM(tagihan.total_tagihan) AS total_tagihan,
-                SUM(CASE WHEN tagihan.status = 'Lunas' THEN 1 ELSE 0 END) AS jumlah_lunas,
-                SUM(CASE WHEN tagihan.status = 'Belum Dibayar' THEN 1 ELSE 0 END) AS jumlah_belum
-            FROM tagihan
-            JOIN penggunaan_air ON tagihan.id_penggunaan = penggunaan_air.id_penggunaan
-            GROUP BY MONTH(penggunaan_air.tanggal_pencatatan)
-            ORDER BY bulan ASC
-        ");
-        $rekap = $query->getResultArray();
+        $rekap = $this->getRekapData();
 
-        // Buat HTML untuk ditampilkan di PDF
         $html = '<h3 style="text-align:center;">Laporan Bulanan</h3>';
         $html .= '<table border="1" cellpadding="6" cellspacing="0" width="100%">
                     <thead>
@@ -112,7 +143,6 @@ class Laporan extends BaseController
 
         $html .= '</tbody></table>';
 
-        // Setup Dompdf
         $options = new Options();
         $options->set('isHtml5ParserEnabled', true);
         $dompdf = new Dompdf($options);
@@ -120,9 +150,6 @@ class Laporan extends BaseController
         $dompdf->setPaper('A4', 'landscape');
         $dompdf->render();
 
-        // Outputkan ke browser
         $dompdf->stream('laporan_bulanan_' . date('Ymd_His') . '.pdf', ['Attachment' => false]);
     }
-
-
 }

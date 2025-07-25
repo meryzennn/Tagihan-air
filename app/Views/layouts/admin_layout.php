@@ -76,8 +76,8 @@
     <i class="bi bi-file-earmark-text"></i> Laporan
   </a>
 
-  <a href="<?= base_url('/tarif') ?>" class="<?= $currentUri === 'tarif' ? 'active' : '' ?>">
-    <i class="bi bi-gear"></i> Tarif Air
+  <a class="nav-link" href="<?= base_url('/tarif') ?>">
+    <i class="bi bi-currency-dollar"></i> Tarif Air
   </a>
 
   <a href="<?= base_url('/logout') ?>">

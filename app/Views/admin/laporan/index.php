@@ -19,18 +19,26 @@
         <th>Belum Dibayar</th>
       </tr>
     </thead>
+
     <tbody>
-      <?php foreach ($rekap as $r): ?>
-      <tr>
-        <td><?= date('F', mktime(0, 0, 0, $r['bulan'], 10)) ?></td>
-        <td><?= $r['total_pelanggan'] ?></td>
-        <td><?= $r['total_pemakaian'] ?> m³</td>
-        <td>Rp <?= number_format($r['total_tagihan'], 0, ',', '.') ?></td>
-        <td><?= $r['jumlah_lunas'] ?></td>
-        <td><?= $r['jumlah_belum'] ?></td>
-      </tr>
-      <?php endforeach ?>
+    <?php if (!empty($rekap)): ?>
+        <?php foreach ($rekap as $r): ?>
+        <tr>
+            <td><?= date('F', mktime(0, 0, 0, $r['bulan'], 10)) ?></td>
+            <td><?= $r['total_pelanggan'] ?></td>
+            <td><?= $r['total_pemakaian'] ?> m³</td>
+            <td>Rp <?= number_format($r['total_tagihan'], 0, ',', '.') ?></td>
+            <td><?= $r['jumlah_lunas'] ?></td>
+            <td><?= $r['jumlah_belum'] ?></td>
+        </tr>
+        <?php endforeach ?>
+    <?php else: ?>
+        <tr>
+        <td colspan="7" class="text-center">Tidak ada laporan.</td>
+        </tr>
+    <?php endif; ?>
     </tbody>
+
   </table>
 </div>
 

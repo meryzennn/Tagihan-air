@@ -38,6 +38,7 @@
           <th>Nama</th>
           <th>Tanggal</th>
           <th>Total Pemakaian (m³)</th>
+          <th>Harga/m³</th>
           <th>Total Tagihan</th>
           <th>Status</th>
         </tr>
@@ -45,19 +46,33 @@
       <tbody>
         <?php if (!empty($tagihan)): ?>
           <?php
-            // Ambil nilai dari pager
+            $db = \Config\Database::connect();
             $currentPage = $pager->getCurrentPage('tagihan') ?? 1;
             $perPage = $pager->getPerPage('tagihan') ?? 10;
             $no = 1 + ($perPage * ($currentPage - 1));
           ?>
           <?php foreach ($tagihan as $t): ?>
+            <?php
+              // Hitung tarif berdasarkan tanggal pencatatan
+              $tarif = $db->table('tarif_air')
+                  ->where('berlaku_mulai <=', $t['tanggal_pencatatan'])
+                  ->orderBy('berlaku_mulai', 'DESC')
+                  ->get()
+                  ->getRowArray();
+
+              $harga_per_m3 = $tarif ? $tarif['harga_per_m3'] : 2500;
+
+              $pemakaian = $t['meter_akhir'] - $t['meter_awal'];
+              $total_tagihan = $pemakaian * $harga_per_m3;
+            ?>
             <tr>
               <td><?= $no++ ?></td>
               <td><?= esc($t['no_pelanggan']) ?></td>
               <td><?= esc($t['nama_lengkap']) ?></td>
               <td><?= date('d-m-Y', strtotime($t['tanggal_pencatatan'])) ?></td>
-              <td><?= esc($t['meter_akhir'] - $t['meter_awal']) ?> m³</td>
-              <td>Rp <?= number_format(($t['meter_akhir'] - $t['meter_awal']) * 2500, 0, ',', '.') ?></td>
+              <td><?= $pemakaian ?> m³</td>
+              <td>Rp <?= number_format($harga_per_m3, 0, ',', '.') ?></td>
+              <td>Rp <?= number_format($total_tagihan, 0, ',', '.') ?></td>
               <td>
                 <?php if ($t['status'] === 'Lunas'): ?>
                   <span class="badge bg-success">Lunas</span>
@@ -69,7 +84,7 @@
           <?php endforeach; ?>
         <?php else: ?>
           <tr>
-            <td colspan="7" class="text-center">Tidak ada data tagihan.</td>
+            <td colspan="8" class="text-center">Tidak ada data tagihan.</td>
           </tr>
         <?php endif; ?>
       </tbody>

@@ -45,6 +45,9 @@ $routes->group('', ['filter' => 'auth'], function($routes) {
     $routes->get('/admin/laporan', 'Laporan::index');
     $routes->get('/admin/laporan/export/excel', 'Laporan::exportExcel');
     $routes->get('/admin/laporan/pdf', 'Laporan::exportPDF');
+    // Tarif Air
+    $routes->get('/tarif', 'Tarif::index');
+    $routes->post('/tarif/update', 'Tarif::update');
 
 
 
