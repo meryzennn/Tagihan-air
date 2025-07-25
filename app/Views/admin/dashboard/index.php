@@ -11,7 +11,7 @@
     <div class="card stat-card text-bg-primary text-white">
       <div class="card-body">
         <h6>Total Pelanggan</h6>
-        <h3 class="fw-bold">124</h3>
+        <h3 class="fw-bold"><?= $totalPelanggan ?></h3>
         <p class="mb-0"><i class="bi bi-people-fill"></i> Aktif & terdaftar</p>
       </div>
     </div>
@@ -20,7 +20,7 @@
     <div class="card stat-card text-bg-warning text-dark">
       <div class="card-body">
         <h6>Tagihan Belum Dibayar</h6>
-        <h3 class="fw-bold">42</h3>
+        <h3 class="fw-bold"><?= $tagihanBelum ?></h3>
         <p class="mb-0"><i class="bi bi-exclamation-triangle-fill"></i> Menunggu pembayaran</p>
       </div>
     </div>
@@ -29,7 +29,7 @@
     <div class="card stat-card text-bg-success text-white">
       <div class="card-body">
         <h6>Tagihan Lunas</h6>
-        <h3 class="fw-bold">82</h3>
+        <h3 class="fw-bold"><?= $tagihanLunas ?></h3>
         <p class="mb-0"><i class="bi bi-check-circle-fill"></i> Pembayaran berhasil</p>
       </div>
     </div>
@@ -51,10 +51,10 @@
   new Chart(ctx, {
     type: 'line',
     data: {
-      labels: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun'],
+      labels: <?= $bulan ?>,
       datasets: [{
         label: 'Pemakaian Air (m³)',
-        data: [820, 710, 950, 1050, 880, 930],
+        data: <?= $totalPemakaian ?>,
         borderColor: '#0d6efd',
         backgroundColor: 'rgba(13,110,253,0.1)',
         tension: 0.4
