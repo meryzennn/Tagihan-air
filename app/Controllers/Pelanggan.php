@@ -59,10 +59,20 @@ class Pelanggan extends Controller
     public function delete($id)
     {
         $model = new PelangganModel();
+        $penggunaanModel = new \App\Models\PenggunaanAirModel();
+
+        // Cek apakah masih ada data penggunaan air terkait pelanggan ini
+        $penggunaan = $penggunaanModel->where('id_user', $id)->first();
+
+        if ($penggunaan) {
+            return redirect()->to('/pelanggan')->with('error', 'Tidak bisa menghapus pelanggan karena masih ada data penggunaan air.');
+        }
+
         $model->delete($id);
 
         return redirect()->to('/pelanggan')->with('success', 'Data pelanggan berhasil dihapus.');
     }
+
     public function edit($id)
     {
         $model = new \App\Models\PelangganModel();
