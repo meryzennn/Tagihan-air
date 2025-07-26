@@ -118,11 +118,18 @@ class PenggunaanAir extends BaseController
 
     public function delete($id)
     {
-        $model = new PenggunaanAirModel();
-        $model->delete($id);
+        $penggunaanModel = new PenggunaanAirModel();
+        $tagihanModel = new TagihanModel();
+
+        // Hapus tagihan terlebih dahulu
+        $tagihanModel->where('id_penggunaan', $id)->delete();
+
+        // Hapus data penggunaan air
+        $penggunaanModel->delete($id);
 
         return redirect()->to('/penggunaan-air')->with('success', 'Data berhasil dihapus.');
     }
+
 
     public function export()
     {
