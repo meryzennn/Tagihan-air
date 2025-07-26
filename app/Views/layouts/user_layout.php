@@ -18,7 +18,7 @@
 
 <div class="sidebar">
   <h5 class="mb-4">Pelanggan</h5>
-  <a href="<?= base_url('/dashboard/user') ?>"><i class="bi bi-house-door"></i> Dashboard</a>
+  <a href="<?= base_url('/user/dashboard') ?>"><i class="bi bi-house-door"></i> Dashboard</a>
   <a href="#"><i class="bi bi-droplet-half"></i> Cek Pemakaian</a>
   <a href="#"><i class="bi bi-cash"></i> Riwayat Tagihan</a>
   <a href="#"><i class="bi bi-person"></i> Profil</a>

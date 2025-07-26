@@ -27,6 +27,8 @@ class Auth extends Controller
             $session->set([
                 'id_user'   => $user['id_user'],
                 'username'  => $user['username'],
+                'nama_lengkap' => $user['nama_lengkap'],
+                'no_pelanggan'  => $user['no_pelanggan'],
                 'role'      => $user['role'],
                 'logged_in' => true
             ]);
@@ -35,7 +37,7 @@ class Auth extends Controller
             if ($user['role'] === 'admin') {
                 return redirect()->to('/dashboard/admin');
             } elseif ($user['role'] === 'pelanggan') {
-                return redirect()->to('/dashboard/user');
+                return redirect()->to('/user/dashboard');
             } else {
                 return redirect()->to('/login')->with('error', 'Role tidak valid.');
             }

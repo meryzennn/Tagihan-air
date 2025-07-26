@@ -17,7 +17,7 @@ $routes->post('/register/save', 'Auth::register');
 $routes->group('', ['filter' => 'auth'], function($routes) {
     // Dashboard
     $routes->get('/dashboard/admin', 'Dashboard::admin');
-    $routes->get('/dashboard/user', 'User::index');
+    $routes->get('/user/dashboard', 'User::index');
 
 
     // adminCRUD
