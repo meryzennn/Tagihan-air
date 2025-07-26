@@ -17,7 +17,8 @@ $routes->post('/register/save', 'Auth::register');
 $routes->group('', ['filter' => 'auth'], function($routes) {
     // Dashboard
     $routes->get('/dashboard/admin', 'Dashboard::admin');
-    $routes->get('/dashboard/user', 'Dashboard::user');
+    $routes->get('/dashboard/user', 'User::index');
+
 
     // adminCRUD
     $routes->get('/pelanggan', 'Pelanggan::index');
@@ -48,6 +49,9 @@ $routes->group('', ['filter' => 'auth'], function($routes) {
     // Tarif Air
     $routes->get('/tarif', 'Tarif::index');
     $routes->post('/tarif/update', 'Tarif::update');
+
+    // User
+    
 
 
 

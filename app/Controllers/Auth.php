@@ -23,6 +23,7 @@ class Auth extends Controller
         $user = $model->where('username', $username)->first();
 
         if ($user && password_verify($password, $user['password'])) {
+            // Set session
             $session->set([
                 'id_user'   => $user['id_user'],
                 'username'  => $user['username'],
@@ -30,14 +31,16 @@ class Auth extends Controller
                 'logged_in' => true
             ]);
 
-            // Redirect sesuai role
+            // Redirect berdasarkan role
             if ($user['role'] === 'admin') {
                 return redirect()->to('/dashboard/admin');
-            } else {
+            } elseif ($user['role'] === 'pelanggan') {
                 return redirect()->to('/dashboard/user');
+            } else {
+                return redirect()->to('/login')->with('error', 'Role tidak valid.');
             }
         } else {
-            return redirect()->back()->with('error', 'Username atau Password salah.');
+            return redirect()->back()->with('error', 'Username atau password salah.');
         }
     }
 
@@ -47,7 +50,6 @@ class Auth extends Controller
         return redirect()->to('/login')->with('success', 'Anda berhasil logout!');
     }
 
-
     public function registerForm()
     {
         return view('auth/register');
@@ -55,29 +57,27 @@ class Auth extends Controller
 
     public function register()
     {
-        helper('text'); // Untuk fungsi random_string
+        helper('text');
         $model = new UserModel();
 
-        $username = $this->request->getPost('username');
-        $password = $this->request->getPost('password');
-        $confirm  = $this->request->getPost('password_confirm');
-
-        $nama   = $this->request->getPost('nama_lengkap');
-        $alamat = $this->request->getPost('alamat');
-        $no_hp  = $this->request->getPost('no_hp');
-        
+        $username   = $this->request->getPost('username');
+        $password   = $this->request->getPost('password');
+        $confirm    = $this->request->getPost('password_confirm');
+        $nama       = $this->request->getPost('nama_lengkap');
+        $alamat     = $this->request->getPost('alamat');
+        $no_hp      = $this->request->getPost('no_hp');
 
         // Validasi
         if ($password !== $confirm) {
-            return redirect()->back()->with('error', 'Konfirmasi password tidak cocok');
+            return redirect()->back()->withInput()->with('error', 'Konfirmasi password tidak cocok.');
         }
 
         if ($model->where('username', $username)->first()) {
-            return redirect()->back()->with('error', 'Username sudah digunakan');
+            return redirect()->back()->withInput()->with('error', 'Username sudah digunakan.');
         }
 
-        // Generate No Pelanggan
-        $noPelanggan = 'PLG' . strtoupper(random_string('alnum', 6));
+        // Generate nomor pelanggan
+        $noPelanggan = 'PLG' . strtoupper(random_string('numeric', 6));
 
         $model->save([
             'username'      => $username,
@@ -86,7 +86,8 @@ class Auth extends Controller
             'nama_lengkap'  => $nama,
             'alamat'        => $alamat,
             'no_hp'         => $no_hp,
-            'no_pelanggan'  => $noPelanggan
+            'no_pelanggan'  => $noPelanggan,
+            'created_at'    => date('Y-m-d H:i:s')
         ]);
 
         return redirect()->to('/login')->with('success', 'Akun berhasil dibuat. Silakan login.');
