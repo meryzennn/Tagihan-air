@@ -44,13 +44,16 @@ class User extends BaseController
             $totalBelum += $pemakaianTagihan * $harga;
         }
 
-        // Ambil riwayat semua tagihan user
-        $riwayatData = $tagihanModel
+        // PAGINATION RIWAYAT
+        $perPage = 5;
+        $riwayatQuery = $tagihanModel
             ->select('penggunaan_air.*, tagihan.status')
             ->join('penggunaan_air', 'penggunaan_air.id_penggunaan = tagihan.id_penggunaan')
             ->where('penggunaan_air.id_user', $id_user)
-            ->orderBy('penggunaan_air.tanggal_pencatatan', 'ASC')
-            ->findAll();
+            ->orderBy('penggunaan_air.tanggal_pencatatan', 'ASC');
+
+        $riwayatData = $riwayatQuery->paginate($perPage, 'riwayat');
+        $pager = $tagihanModel->pager;
 
         $riwayat = [];
         foreach ($riwayatData as $r) {
@@ -76,7 +79,8 @@ class User extends BaseController
         return view('user/dashboard/index', [
             'pemakaian'     => $pemakaian,
             'tagihan_belum' => $totalBelum,
-            'riwayat'       => $riwayat
+            'riwayat'       => $riwayat,
+            'pager'         => $pager
         ]);
     }
 }

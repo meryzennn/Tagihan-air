@@ -62,7 +62,7 @@
                 <td><?= date('F Y', strtotime($r['tanggal_pencatatan'])) ?></td>
                 <td><?= $r['meter_awal'] ?></td>
                 <td><?= $r['meter_akhir'] ?></td>
-                <td><?= $r['meter_akhir'] - $r['meter_awal'] ?> m³</td>
+                <td><?= $r['pemakaian'] ?> m³</td>
                 <td>Rp <?= number_format($r['total_tagihan'], 0, ',', '.') ?></td>
                 <td><?= esc($r['status']) ?></td>
               </tr>
@@ -72,6 +72,17 @@
           <?php endif; ?>
         </tbody>
       </table>
+
+      <?php if ($pager): ?>
+      <div class="d-flex justify-content-between align-items-center mt-3 flex-wrap">
+        <div class="text-muted">
+          <?= $pager->getCurrentPage('riwayat') ? 'Halaman ' . $pager->getCurrentPage('riwayat') : '' ?>
+        </div>
+        <div>
+          <?= $pager->links('riwayat', 'bootstrap_full') ?>
+        </div>
+      </div>
+      <?php endif; ?>
     </div>
   </div>
 </div>
